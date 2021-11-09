@@ -49,8 +49,8 @@ int main(int argc, char const *argv[])
 	//-------------------------------------------------------------------------//
 	// YOUR CODE GOES HERE.
 	// 1. Create geometry
-	float points[] = { -1.5f, -0.5f, 0.0f,
-						0.0f, 1.5f, 0.0f,
+	float points[] = { -0.5f, -0.5f, 0.0f,
+						0.0f, 0.5f, 0.0f,
 						0.5f, -0.5f, 0.0f };
 	GLuint VAO, VBO;
 	// 2. Create VAO

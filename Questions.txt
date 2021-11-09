@@ -1,0 +1,43 @@
+//--------------------------------------------------------------------------------------
+Question 1: What is the output of your program? That is, what hardware (renderer) do
+	    you have, and what OpenGL version does it support?
+
+Answer: My computer uses: 
+		Renderer: GeForce GTX 1660 Ti/PCIe/SSE2
+		Version Supported: 4.6.0 NVIDIA 457.49
+
+//--------------------------------------------------------------------------------------
+Question 2: Which usage flag did you select, and why?
+
+Answer: GL_STATIC_DRAW since the data will only be modified once but probably used 
+	many times.
+
+//--------------------------------------------------------------------------------------
+Question 3: Which dimensions (left, right, etc) in the screen space (that is, in 
+	    the window on your screen) do the x, y and z coordinates of your vertex 
+	    position attributes map to?
+
+Answer: Origo is in the middle of the window, then the x-axis goes left to -1 and 
+	right to 1, y-axis goes up and down to 1 and -1, z-axis is in and out of the 
+	window from -1 to 1. How it could be determined that -1 is in and 1 is out of 
+	the window was thanks to different values given to the z values in the vertexes 
+	to see how the triangle reacted.
+
+//--------------------------------------------------------------------------------------
+Question 4: What are the limits for x and y and what happens if you exceed them?
+
+Answer: Already mentioned before that the limits are -1 and 1, if it exceeds the 
+	limits then the triangle will be cut of at the lines the window is sized. 
+	So a new weird form is shown.
+
+//--------------------------------------------------------------------------------------
+Question 5: What are the limits for z and what happens if you exceed them? Why? 
+            (It has to do with normalised device coordinates.)
+
+Answer: Same as before, the parts of the triangle that is outside the bounds will 
+	be cut out and a new shape will be showed to us.
+
+//--------------------------------------------------------------------------------------
+Question 6:
+
+Answer:
