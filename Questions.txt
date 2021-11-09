@@ -35,9 +35,11 @@ Question 5: What are the limits for z and what happens if you exceed them? Why?
             (It has to do with normalised device coordinates.)
 
 Answer: Same as before, the parts of the triangle that is outside the bounds will 
-	be cut out and a new shape will be showed to us.
+	be cut out (clipping) and a new shape will be showed to us. The bounds are 
+	(-1 -> 1) for all axes since the nomalised device coordinates has it as standard.
 
 //--------------------------------------------------------------------------------------
-Question 6:
+Question 6: Should the matrices be multiplied as M × V × P or P × V × M? Why?
 
-Answer:
+Answer: PVM is the correct way to multiply them since matrix multiplication is
+	read right-left. (I added a brackets to be safe) 
