@@ -1,3 +1,5 @@
+// Replace with your own code, starting from what you had in Lab 1,
+// but use the geometry defined below.
 
 #include <GL/glew.h>
 #include <cmath>
@@ -24,8 +26,8 @@ void checkShaderCompileError(GLint shaderID)
 {
 	GLint isCompiled = 0;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &isCompiled);
- 
-	if(isCompiled == GL_FALSE)
+
+	if (isCompiled == GL_FALSE)
 	{
 		GLint maxLength = 0;
 		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &maxLength);
@@ -41,7 +43,7 @@ void checkShaderCompileError(GLint shaderID)
 	}
 	else
 		std::cout << "shader compilation success." << std::endl;
-    
+
 	return;
 }
 
@@ -62,8 +64,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if ((key == GLFW_KEY_R) && action == GLFW_PRESS)
 	{
 		//implement reloading of the shaders on the fly
-		std::string vertex_shader_str = readFile("../lab1-7_vs.glsl");
-		std::string fragment_shader_str = readFile("../lab1-7_fs.glsl");
+		std::string vertex_shader_str = readFile("../lab2-1_vs.glsl");
+		std::string fragment_shader_str = readFile("../lab2-1_fs.glsl");
 		const char* vertex_shader_src = vertex_shader_str.c_str();
 		const char* fragment_shader_src = fragment_shader_str.c_str();
 
@@ -105,86 +107,167 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-int main(int argc, char const *argv[])
+float points[] = {
+	// A cube has 8 vertices, but now we have three copies of each one:
+  -0.5, -0.5, -0.5, 1, //0 0
+	-0.5, -0.5, -0.5, 1, //0 1
+	-0.5, -0.5, -0.5, 1, //0 2
+	//
+  -0.5, -0.5,  0.5, 1, //1 3
+  -0.5, -0.5,  0.5, 1, //1 4
+  -0.5, -0.5,  0.5, 1, //1 5
+	//
+  -0.5,  0.5, -0.5, 1, //2 6
+  -0.5,  0.5, -0.5, 1, //2 7
+  -0.5,  0.5, -0.5, 1, //2 8
+	//
+  -0.5,  0.5,  0.5, 1, //3 9
+  -0.5,  0.5,  0.5, 1, //3 10
+  -0.5,  0.5,  0.5, 1, //3 11
+	//
+  0.5, -0.5, -0.5, 1, //4 12
+  0.5, -0.5, -0.5, 1, //4 13
+  0.5, -0.5, -0.5, 1, //4 14
+	//
+  0.5, -0.5,  0.5, 1, //5 15
+  0.5, -0.5,  0.5, 1, //5 16
+  0.5, -0.5,  0.5, 1, //5 17
+	//
+  0.5,  0.5, -0.5, 1, //6 18
+  0.5,  0.5, -0.5, 1, //6 19
+  0.5,  0.5, -0.5, 1, //6 20
+	//
+  0.5,  0.5,  0.5, 1, //7 21
+  0.5,  0.5,  0.5, 1, //7 22
+  0.5,  0.5,  0.5, 1, //7 23
+};
+  
+
+unsigned short faces[]= {
+	// ... and 12 triangular faces, 
+	// defined by the following vertex indices:
+	0, 9, 6, // 0 3 2
+	0, 3, 9, // 0 1 3
+	//
+	1, 7, 18, // 0 2 6
+	1, 18, 12, // 0 6 4
+	//
+	13, 19, 15, // 4 6 5
+	15, 19, 21, // 5 6 7
+	//
+	16, 22, 10, // 5 7 3
+	16, 10, 4, // 5 3 1
+	//
+	8, 11, 23, // 2 3 7
+	8, 23, 20, // 2 7 6
+	//
+	2, 14, 5, // 0 4 1
+	5, 14, 17 // 1 4 5
+};
+
+glm::vec4 normals[24];
+
+
+int main( int argc, char** argv )
 {
+	// Insert your code from Lab 1
 	// start GL context and O/S window using the GLFW helper library
-  
+
 	glfwSetErrorCallback(error_callback);
-	if( !glfwInit() )
+	if (!glfwInit())
 		exit(EXIT_FAILURE);
-  
-  
+
+
 	int w_height = 600;
 	int w_width = 800;
 
 	glfwSetErrorCallback(error_callback);
-	if( !glfwInit() )
+	if (!glfwInit())
 		exit(EXIT_FAILURE);
-  
-	GLFWwindow* window = glfwCreateWindow (w_width, w_height, "Hello Icosahedron", NULL, NULL);
+
+	GLFWwindow* window = glfwCreateWindow(w_width, w_height, "Hello Icosahedron", NULL, NULL);
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	
+
 	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-	glfwMakeContextCurrent (window);
-                                  
+	glfwMakeContextCurrent(window);
+
 	// start GLEW extension handler
 	glewExperimental = GL_TRUE;
-	glewInit ();
+	glewInit();
 
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
-	glEnable (GL_DEPTH_TEST); // enable depth-testing
-	glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
-  
-	//-----------------------------------------------------------------------------------------------------------------------------------------------------------//
-	// Set up geometry, VBO, EBO, VAO
-	float points[] = { -0.5f, -0.5f, -0.5f, 1.0f, //vertex 0
-						-0.5f, -0.5f, 0.5f, 1.0f,//vertex 1
-						-0.5f, 0.5f, 0.5f, 1.0f,  //vertex 2
-						-0.5f, 0.5f, -0.5f, 1.0f, //vertex 3
-						0.5f, -0.5f, -0.5f, 1.0f, //vertex 4
-						0.5f, -0.5f, 0.5f, 1.0f,  //vertex 5
-						0.5f, 0.5f, 0.5f, 1.0f,   //vertex 6
-						0.5f, 0.5f, -0.5f, 1.0f,  //vertex 7
-	};
-	unsigned short faces[] = {
-							0, 2, 3, //Triangle 1 face 1(left)
-							0, 1, 2, //Triangle 2 face 1(left)
-							1, 6, 2, //Triangle 3 face 2(front)
-							1, 5, 6, //Triangle 4 face 2(front)
-							5, 7, 6, //Triangle 5 face 3(right)
-							5, 4, 7, //Triangle 6 face 3(right)
-							4, 3, 7, //Triangle 7 face 4(back)
-							4, 0, 3, //Triangle 8 face 4(back)
-							2, 7, 3, //Triangle 9 face 5(Top)
-							2, 6, 7, //Triangle 10 face 5(Top)
-							0, 5, 1, //Triangle 11 face 6(Bottom)
-							0, 4, 5//Triangle 12 face 6(Bottom)
-	};
-	GLuint VAO, VBO, EBO;
+	glEnable(GL_DEPTH_TEST); // enable depth-testing
+	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
+
+	//Creating the normal vectors----------------------------------------------------------------------------------------//
+	glm::vec4 norm;
+
+	for (int i = 0; i < 36; i = i + 3) {
+		
+		unsigned short f0 = faces[i] * 4;
+		unsigned short f1 = faces[i+1] * 4;
+		unsigned short f2 = faces[i+2] * 4;
+		
+		//The different points
+		float p1[] = { points[f0],
+						points[f0 + 1],
+						points[f0 + 2] };
+		float p2[] = { points[f1],
+						points[f1 + 1],
+						points[f1 + 2] };
+		float p3[] = { points[f2],
+						points[f2 + 1],
+						points[f2 + 2] };
+
+		float a = p2[0] - p1[0];
+		float b = p2[1] - p1[1];
+		float c = p2[2] - p1[2];
+		float a2 = p3[0] - p1[0];
+		float b2 = p3[1] - p1[1];
+		float c2 = p3[2] - p1[2];
+
+		//adding the cross product of the points to a normal vector holder
+		norm = glm::vec4(glm::cross(glm::vec3(a,b,c), glm::vec3(a2,b2,c2)), 0.0);
+		
+		
+		//adding the vector holder to an array of normal vector holder
+		normals[faces[i]] = norm;
+		normals[faces[i+1]] = norm;
+		normals[faces[i+2]] = norm;
+	}
+	//----------------------------------------------------------------------------------------------------------------------------------------//
+	for (int i = 0; i < 24; i++) {
+		printf("Norms: %f, %f, %f  \n", float(normals[i].x), float(normals[i].y), float(normals[i].z));
+	}
+	//Creating the VAO, VBO, EBO--------------------------------------------------------------------------------------------------------------//
+	GLuint VAO, VBO, VBOn, EBO;
 	// 2. Create VAO
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 	// 3. Create VBO & EBO
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(faces), faces, GL_STATIC_DRAW);
-
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points), &points, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	//-----------------------------------------------------------------------------------------------------------------------------------------------------------//
-	//-----------------------------------------------------------------------------------------------------------------------------------------------------------//
-	// load and compile shaders  "../lab1-7_vs.glsl" and "../lab1-7_fs.glsl"
-	std::string vertex_shader_str = readFile("../lab1-7_vs.glsl");
-	std::string fragment_shader_str = readFile("../lab1-7_fs.glsl");
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
+
+	glGenBuffers(1, &VBOn);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOn);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(normals), &normals, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(faces), &faces, GL_STATIC_DRAW);
+
+	//Read in the shader files-----------------------------------------------------------------------------------------------------------------------------//
+	std::string vertex_shader_str = readFile("../lab2-1_vs.glsl");
+	std::string fragment_shader_str = readFile("../lab2-1_fs.glsl");
 	const char* vertex_shader_src = vertex_shader_str.c_str();
 	const char* fragment_shader_src = fragment_shader_str.c_str();
 
@@ -198,7 +281,7 @@ int main(int argc, char const *argv[])
 	glCompileShader(fs);
 	checkShaderCompileError(fs);
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------//
-	GLuint shader_program = glCreateProgram ();
+	GLuint shader_program = glCreateProgram();
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------//
 	// attach and link vertex and fragment shaders into a shader program
 	glAttachShader(shader_program, fs);
@@ -208,63 +291,53 @@ int main(int argc, char const *argv[])
 	glDeleteShader(fs);
 	glUseProgram(shader_program);
 	//-----------------------------------------------------------------------------------------------------------------------------------------------------------//
-	
- 
+
 	const float n = 1.0f;
 	const float f = 100.0f;
-  
 
-	while (!glfwWindowShouldClose (window)) 
+	while (!glfwWindowShouldClose(window))
 	{
-
-
-		glfwGetFramebufferSize(window, &w_width , &w_height );
+		glfwGetFramebufferSize(window, &w_width, &w_height);
 
 		//-----------------------------------------------------------------------//
-		// YOUR CODE GOES HERE
-		//
-		// Use glm::perspective to create a projection matrix
-		//
-		// Use glm::translate, glm::rotate and glm::inverse to create the
-		// model and view matrices.
+		// Copying from previous task
 		glm::mat4 modelMatrix = glm::mat4(1.0f);
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
-		projectionMatrix = glm::perspective(glm::radians(90.0f), (float(w_width) / w_height), n, f);
+		projectionMatrix = glm::perspective(glm::radians(90.0f), float(w_width / w_height), n, f);
 		modelMatrix = glm::rotate(modelMatrix, glm::radians(g_rotation[0]), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelMatrix = glm::rotate(modelMatrix, glm::radians(g_rotation[1]), glm::vec3(1.0f, 0.0f, 0.0f));
 
-		glm::mat4 modelViewProjectionMatrix = projectionMatrix * (viewMatrix * modelMatrix);
+		glm::mat4 modelViewMatrix = viewMatrix * modelMatrix;
+		int MVM_loc = glGetUniformLocation(shader_program, "modelViewMatrixpos");
+		glUniformMatrix4fv(MVM_loc, 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
 
-		int shade_loc = glGetUniformLocation(shader_program, "position");
+		glm::mat4 modelViewProjectionMatrix = projectionMatrix * (viewMatrix * modelMatrix);
+		int shade_loc = glGetUniformLocation(shader_program, "projectionModelViewMatrixpos");
 		glUniformMatrix4fv(shade_loc, 1, GL_FALSE, glm::value_ptr(modelViewProjectionMatrix));
-		//
-		// Multiply your matrices in the correct order to get a
-		// modelViewProjection matrix and upload it to the appropriate
-		// uniform variable in vertex shader.
 		// -----------------------------------------------------------------------//
 
 
 		// update other events like input handling 
-		glfwPollEvents ();
-    
-		// clear the drawing surface
-		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glfwPollEvents();
 
-		
+		// clear the drawing surface
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 		//-----------------------------------------------------------------------//
 		// Issue an appropriate glDraw*() command.
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
 
 		//-----------------------------------------------------------------------//
 
-		glfwSwapBuffers (window);
+		glfwSwapBuffers(window);
 	}
 
 	// close GL context and any other GLFW resources
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
+	return 0;
 }
-

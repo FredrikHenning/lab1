@@ -17,6 +17,7 @@ void MUL_4x4 (GLfloat (*C)[4], const GLfloat (*A)[4], const GLfloat (*B)[4])
 {
 	//-------------------------------------------------------------------------//
 	// YOUR CODE GOES HERE
+	// Condition: C is a 0 matrix
 	// Compute C = A x B
 	for (int i = 0; i < 4; i++) {			//Row
 		for (int j = 0; j < 4; j++) {		//Column
@@ -228,8 +229,6 @@ int main(int argc, char const* argv[])
 	glDeleteShader(fs);
 	glUseProgram(shader_program);
 	//Done---------------------------------------------------------------------//
-
-	glUseProgram(shader_program);
 
 	float n = 1.0;
 	float f = 100.0;

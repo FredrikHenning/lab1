@@ -9,11 +9,11 @@ void main () {
 	gl_Position = vec4(vp.x + position_offset.x, vp.y + position_offset.y, vp.z, 1.0);
 	
 //The color will follow with the triangle
-	//pos = vp;
+	pos = vp;
 
 //The color will be stationary
-	pos.x = gl_Position.x;
-	pos.y = gl_Position.y;
+	//pos.x = gl_Position.x;
+	//pos.y = gl_Position.y;
 
 };
   
