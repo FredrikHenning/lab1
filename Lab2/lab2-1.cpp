@@ -205,7 +205,9 @@ int main( int argc, char** argv )
 
 	//Creating the normal vectors----------------------------------------------------------------------------------------//
 	glm::vec4 norm;
-
+	float p1[3];
+	float p2[3];
+	float p3[3];
 	for (int i = 0; i < 36; i = i + 3) {
 		
 		unsigned short f0 = faces[i] * 4;
@@ -213,15 +215,9 @@ int main( int argc, char** argv )
 		unsigned short f2 = faces[i+2] * 4;
 		
 		//The different points
-		float p1[] = { points[f0],
-						points[f0 + 1],
-						points[f0 + 2] };
-		float p2[] = { points[f1],
-						points[f1 + 1],
-						points[f1 + 2] };
-		float p3[] = { points[f2],
-						points[f2 + 1],
-						points[f2 + 2] };
+		p1[0] = points[f0]; p1[1] = points[f0 + 1]; p1[2] = points[f0 + 2];
+		p2[0] = points[f1]; p2[1] = points[f1 + 1]; p2[2] = points[f1 + 2];
+		p3[0] = points[f2]; p3[1] = points[f2 + 1]; p3[2] = points[f2 + 2];
 
 		float a = p2[0] - p1[0];
 		float b = p2[1] - p1[1];
@@ -306,7 +302,7 @@ int main( int argc, char** argv )
 		glm::mat4 projectionMatrix = glm::mat4(1.0f);
 
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, -2.0f));
-		projectionMatrix = glm::perspective(glm::radians(90.0f), float(w_width / w_height), n, f);
+		projectionMatrix = glm::perspective(glm::radians(90.0f), (float(w_width) / w_height), n, f);
 		modelMatrix = glm::rotate(modelMatrix, glm::radians(g_rotation[0]), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelMatrix = glm::rotate(modelMatrix, glm::radians(g_rotation[1]), glm::vec3(1.0f, 0.0f, 0.0f));
 
